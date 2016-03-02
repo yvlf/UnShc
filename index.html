@@ -39,36 +39,36 @@
 <p>SHc (SHell compiler) is a fabulous tool created and maintained by Francisco Javier Rosales Garcia (<a href="http://www.datsi.fi.upm.es/%7Efrosal/">http://www.datsi.fi.upm.es/~frosal/</a>).
 This tool protect any shell script with encryption (ARC4).</p>
 
-<p>wget -q <a href="http://www.datsi.fi.upm.es/%7Efrosal/sources/shc-3.8.9.tgz">http://www.datsi.fi.upm.es/~frosal/sources/shc-3.8.9.tgz</a>
+<div class="highlight highlight-source-shell"><pre>wget -q http://www.datsi.<span class="pl-k">fi</span>.upm.es/~frosal/sources/shc-3.8.9.tgz
 tar zxvf shc-3.8.9.tgz
-cd shc-3.8.9
-make</p>
+<span class="pl-c1">cd</span> shc-3.8.9
+make</pre></div>
 
 <h1>
 <a id="how-to-use-shc-" class="anchor" href="#how-to-use-shc-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to use SHc ?</h1>
 
-<p>root@server:~/shc/shc-3.8.9# shc -h
+<div class="highlight highlight-source-shell"><pre>root@server:<span class="pl-k">~</span>/shc/shc-3.8.9# shc -h
 shc Version 3.8.9, Generic Script Compiler
-shc Copyright (c) 1994-2012 Francisco Rosales <a href="mailto:frosal@fi.upm.es">frosal@fi.upm.es</a>
+shc Copyright (c) 1994-2012 Francisco Rosales <span class="pl-k">&lt;</span>frosal@<span class="pl-k">fi</span>.upm.es<span class="pl-k">&gt;</span>
 shc Usage: shc [-e date] [-m addr] [-i iopt] [-x cmnd] [-l lopt] [-rvDTCAh] -f script
--e %s Expiration date in dd/mm/yyyy format [none]
--m %s Message to display upon expiration ["Please contact your provider"]
+-e %s Expiration date <span class="pl-k">in</span> dd/mm/yyyy format [none]
+-m %s Message to display upon expiration [<span class="pl-k">&amp;</span>quot<span class="pl-k">;</span>Please contact your provider<span class="pl-k">&amp;</span>quot<span class="pl-k">;</span>]
 -f %s File name of the script to compile
--i %s Inline option for the shell interpreter i.e: -e
--x %s eXec command, as a printf format i.e: exec('%s',<a href="https://github.com/ARGV" class="user-mention">@ARGV</a>);
+-i %s Inline option <span class="pl-k">for</span> the shell interpreter i.e: -e
+-x %s eXec <span class="pl-c1">command</span>, as a <span class="pl-c1">printf</span> format i.e: <span class="pl-c1">exec</span>(<span class="pl-s"><span class="pl-pds">'</span>%s<span class="pl-pds">'</span></span>,@ARGV)<span class="pl-k">;</span>
 -l %s Last shell option i.e: --
 -r Relax security. Make a redistributable binary
 -v Verbose compilation
--D Switch ON debug exec calls [OFF]
+-D Switch ON debug <span class="pl-c1">exec</span> calls [OFF]
 -T Allow binary to be traceable [no]
--C Display license and exit
--A Display abstract and exit
--h Display help and exit
+-C Display license and <span class="pl-c1">exit</span>
+-A Display abstract and <span class="pl-c1">exit</span>
+-h Display <span class="pl-c1">help</span> and <span class="pl-c1">exit</span>
 Environment variables used:
 Name Default Usage
-CC cc C compiler command
+CC cc C compiler <span class="pl-c1">command</span>
 CFLAGS C compiler flags
-Please consult the shc(1) man page.</p>
+Please consult the shc(1) man page.</pre></div>
 
 <p>Encrypted shell script are named "*.sh.x" by default.</p>
 
@@ -77,49 +77,58 @@ Please consult the shc(1) man page.</p>
 <h1>
 <a id="how-to-use-unshc-" class="anchor" href="#how-to-use-unshc-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to use UnSHc ?</h1>
 
-<p>[root@server:~/unshc]$ ./unshc.sh -h</p>
-
-<hr>
-
-<p>| | | |     /  <strong><em>| | | |
-| | | |</em> __ \ <code>--.| |_| | ___
-| | | | '_ \</code>--. \  _  |/ __|
-| |_| | | | /\</strong>/ / | | | (__
- ___/|<em>| |</em>____/_| |<em>/__</em>|</p>
-
-<p>--- UnSHc - The shc decrypter.</p>
-
-<h2>
-<a id="----version-06" class="anchor" href="#----version-06" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>--- Version: 0.6</h2>
-
-<p>UnSHc is used to decrypt script encrypted with SHc
-Original idea from Luiz Octavio Duarte (LOD)
-Updated and modernized by Yann CAM</p>
+<div class="highlight highlight-source-shell"><pre>[root@server:<span class="pl-k">~</span>/unshc]$ ./unshc.sh -h
+ _   _       _____ _   _
+<span class="pl-k">|</span> <span class="pl-k">|</span> <span class="pl-k">|</span> <span class="pl-k">|</span>     /  ___<span class="pl-k">|</span> <span class="pl-k">|</span> <span class="pl-k">|</span> <span class="pl-k">|</span>
+<span class="pl-k">|</span> <span class="pl-k">|</span> <span class="pl-k">|</span> <span class="pl-k">|</span>_ __ <span class="pl-cce">\ </span><span class="pl-s"><span class="pl-pds">`</span>--.<span class="pl-k">|</span> <span class="pl-k">|</span>_<span class="pl-k">|</span> <span class="pl-k">|</span> ___</span>
+<span class="pl-s"><span class="pl-k">|</span> <span class="pl-k">|</span> <span class="pl-k">|</span> <span class="pl-k">|</span> <span class="pl-s"><span class="pl-pds">'</span>_ \ `--. \  _  |/ __|</span></span>
+<span class="pl-s"><span class="pl-s">| |_| | | | /\__/ / | | | (__</span></span>
+<span class="pl-s"><span class="pl-s"> \___/|_| |_\____/\_| |_/\___|</span></span>
+<span class="pl-s"><span class="pl-s"></span></span>
+<span class="pl-s"><span class="pl-s">--- UnSHc - The shc decrypter.</span></span>
+<span class="pl-s"><span class="pl-s">--- Version: 0.6</span></span>
+<span class="pl-s"><span class="pl-s">------------------------------</span></span>
+<span class="pl-s"><span class="pl-s">UnSHc is used to decrypt script encrypted with SHc</span></span>
+<span class="pl-s"><span class="pl-s">Original idea from Luiz Octavio Duarte (LOD)</span></span>
+<span class="pl-s"><span class="pl-s">Updated and modernized by Yann CAM</span></span>
+<span class="pl-s"><span class="pl-s">- SHc   : [http://www.datsi.fi.upm.es/~frosal/]</span></span>
+<span class="pl-s"><span class="pl-s">- UnSHc : [https://www.asafety.fr/unshc-the-shc-decrypter/]</span></span>
+<span class="pl-s"><span class="pl-s">------------------------------</span></span>
+<span class="pl-s"><span class="pl-s"></span></span>
+<span class="pl-s"><span class="pl-s">[*] Usage : ./unshc.sh [OPTIONS] &lt;file.sh.x&gt;</span></span>
+<span class="pl-s"><span class="pl-s">         -h | --help                          : print this help message</span></span>
+<span class="pl-s"><span class="pl-s">         -a OFFSET | --arc4 OFFSET            : specify the arc4() offset arbitrarily (without 0x prefix)</span></span>
+<span class="pl-s"><span class="pl-s">         -d DUMPFILE | --dumpfile DUMPFILE    : provide an object dump file (objdump -D script.sh.x &gt; DUMPFILE)</span></span>
+<span class="pl-s"><span class="pl-s">         -s STRFILE | --stringfile STRFILE    : provide a string dump file (objdump -s script.sh.x &gt; STRFILE)</span></span>
+<span class="pl-s"><span class="pl-s">         -o OUTFILE | --outputfile OUTFILE    : indicate the output file name</span></span>
+<span class="pl-s"><span class="pl-s"></span></span>
+<span class="pl-s"><span class="pl-s">[*] e.g :</span></span>
+<span class="pl-s"><span class="pl-s">        ./unshc.sh script.sh.x</span></span>
+<span class="pl-s"><span class="pl-s">        ./unshc.sh script.sh.x -o script_decrypted.sh</span></span>
+<span class="pl-s"><span class="pl-s">        ./unshc.sh script.sh.x -a 400f9b</span></span>
+<span class="pl-s"><span class="pl-s">        ./unshc.sh script.sh.x -d /tmp/dumpfile -s /tmp/strfile</span></span>
+<span class="pl-s"><span class="pl-s">        ./unshc.sh script.sh.x -a 400f9b -d /tmp/dumpfile -s /tmp/strfile -o script_decrypted.sh</span></span></pre></div>
 
 <ul>
-<li>SHc   : [<a href="http://www.datsi.fi.upm.es/%7Efrosal/">http://www.datsi.fi.upm.es/~frosal/</a>]</li>
+<li>Demonstration in video : 
+
+<ul>
+<li><a href="https://www.youtube.com/watch?v=tmHVhMuG-Vg">https://www.youtube.com/watch?v=tmHVhMuG-Vg</a></li>
 </ul>
+</li>
+<li>SHc (in french) : 
 
-<h2>
-<a id="--unshc--httpswwwasafetyfrunshc-the-shc-decrypter" class="anchor" href="#--unshc--httpswwwasafetyfrunshc-the-shc-decrypter" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>- UnSHc : [<a href="https://www.asafety.fr/unshc-the-shc-decrypter/">https://www.asafety.fr/unshc-the-shc-decrypter/</a>]</h2>
+<ul>
+<li><a href="https://www.asafety.fr/prog-and-dev/bashshunix-shc-le-compilateur-et-protecteur-de-script-shell/">https://www.asafety.fr/prog-and-dev/bashshunix-shc-le-compilateur-et-protecteur-de-script-shell/</a></li>
+</ul>
+</li>
+<li>UnSHc (in french) : 
 
-<p>[*] Usage : ./unshc.sh [OPTIONS] 
-         -h | --help                          : print this help message
-         -a OFFSET | --arc4 OFFSET            : specify the arc4() offset arbitrarily (without 0x prefix)
-         -d DUMPFILE | --dumpfile DUMPFILE    : provide an object dump file (objdump -D script.sh.x &gt; DUMPFILE)
-         -s STRFILE | --stringfile STRFILE    : provide a string dump file (objdump -s script.sh.x &gt; STRFILE)
-         -o OUTFILE | --outputfile OUTFILE    : indicate the output file name</p>
-
-<p>[*] e.g :
-        ./unshc.sh script.sh.x
-        ./unshc.sh script.sh.x -o script_decrypted.sh
-        ./unshc.sh script.sh.x -a 400f9b
-        ./unshc.sh script.sh.x -d /tmp/dumpfile -s /tmp/strfile
-        ./unshc.sh script.sh.x -a 400f9b -d /tmp/dumpfile -s /tmp/strfile -o script_decrypted.sh</p>
-
-<p>Demonstration in video : <a href="https://www.youtube.com/watch?v=tmHVhMuG-Vg">https://www.youtube.com/watch?v=tmHVhMuG-Vg</a>
-SHc (in french) : <a href="https://www.asafety.fr/prog-and-dev/bashshunix-shc-le-compilateur-et-protecteur-de-script-shell/">https://www.asafety.fr/prog-and-dev/bashshunix-shc-le-compilateur-et-protecteur-de-script-shell/</a>
-UnSHc (in french) : <a href="https://www.asafety.fr/unshc-the-shc-decrypter/">https://www.asafety.fr/unshc-the-shc-decrypter/</a></p>
+<ul>
+<li><a href="https://www.asafety.fr/unshc-the-shc-decrypter/">https://www.asafety.fr/unshc-the-shc-decrypter/</a></li>
+</ul>
+</li>
+</ul>
       </section>
     </div>
 
