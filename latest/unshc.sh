@@ -1,25 +1,29 @@
 #!/bin/bash
 ###################
 # Author: Luiz Otavio Duarte a.k.a. (LOD)
-#  11/03/08 - v.0.1
+#  11/03/08 - v0.1
 # Updated: Yann CAM v0.2 - yann.cam@gmail.com | www.asafety.fr
-#  06/27/13 - v.0.2
+#  06/27/13 - v0.2
 #  -- Adding new objdump format (2.22) to retrieve data (especially on Ubuntu distribution)
 #  -- Patch few regex with sorted address list
 # Updated: Yann CAM v0.3 - yann.cam@gmail.com | www.asafety.fr
-#  18/11/15 - v.0.3
+#  18/11/15 - v0.3
 #  -- Adapt script for new architecture
 #  -- Clean and optimize functions
 #  -- Add an (unsigned long) cast in shc C source code
-# Updated: Yann CAM v0.3 - yann.cam@gmail.com | www.asafety.fr
-#  14/12/15 - v.0.4
+# Updated: Yann CAM v0.4 - yann.cam@gmail.com | www.asafety.fr
+#  14/12/15 - v0.4
 #  -- Comment specific return statement in C source
 # Updated: Yann CAM v0.5 - yann.cam@gmail.com | www.asafety.fr
-#  15/12/15 - v.0.5
+#  15/12/15 - v0.5
 #  -- Patch extract arc4 function to keep the latest offset only
-# Updated: Yann CAM v0.5 - yann.cam@gmail.com | www.asafety.fr
-#  16/12/15 - v.0.6
+# Updated: Yann CAM v0.6 - yann.cam@gmail.com | www.asafety.fr
+#  16/12/15 - v0.6
 #  -- Add bash script options (getopts)
+# Updated: Yann CAM v0.7 - yann.cam@gmail.com | www.asafety.fr
+#  07/28/16 - v0.7
+#  -- Add support of multiple ARC4 offsets auto-retrieved by script (iterate over each one), specialy for huge bash file encrypted
+#  -- Force .sh extension to decrypted file, for initial file without extension (prevent rewrite of original file)
 ###################
 # Tested on :
 #  Ubuntu 14.04.3 LTS x86_64
@@ -34,7 +38,7 @@
 #    Linux server 3.2.0-4-686-pae #1 SMP Debian 3.2.68-1+deb7u2 i686 GNU/Linux
 #    Linux version 3.2.0-4-686-pae (debian-kernel@lists.debian.org) (gcc version 4.6.3 (Debian 4.6.3-14) ) #1 SMP Debian 3.2.68-1+deb7u2
 ###################
-VERSION="0.6"
+VERSION="0.7"
 
 OBJDUMP=`which objdump`
 GREP=`which grep`
@@ -48,6 +52,7 @@ AWK=`which awk`
 SED=`which sed`
 TR=`which tr`
 HEAD=`which head`
+TAIL=`which tail`
 
 BINARY=""
 TMPBINARY=$(mktemp /tmp/XXXXXX)
@@ -137,19 +142,22 @@ function generate_dump() {
 # Find out the most called function. This function is arc4() and there are 14 calls.
 # Update 27/06/2013 : Regexps updated to match new objdump format and retrieve the $CALLADDR from his number of call (bug initial with "sort")
 # Update 16/11/2015 : Adding new architecture support
+# Update 28/07/2016 : Adding multiple ARC4 offsets support (loop on each candidate)
 function extract_arc4_call_addr(){
-        CALLADDR=$($GREP -Eo "call.*[0-9a-f]{6,}" $DUMPFILE | $GREP -Eo "[0-9a-f]{6,}" | $SORT | $UNIQ -c | $SORT | $GREP -Eo "(14).*[0-9a-f]{6,}" | $GREP -Eo "[0-9a-f]{6,}" | tail -n 1)
-        if [ -z "$CALLADDR" ]; then
+	TAILNUMBER=$1
+	CALLADDRS=$($GREP -Eo "call.*[0-9a-f]{6,}" $DUMPFILE | $GREP -Eo "[0-9a-f]{6,}" | $SORT | $UNIQ -c | $SORT | $GREP -Eo "(14).*[0-9a-f]{6,}" | $GREP -Eo "[0-9a-f]{6,}")
+	TAILMAX=`wc -l <<< "$CALLADDRS"`
+        CALLADDR=$(echo $CALLADDRS | $SED "s/ /\n/g" | $TAIL -n $TAILNUMBER | $HEAD -n 1)
+        if [[ -z "$CALLADDR" || $TAILNUMBER -gt $TAILMAX ]]; then
            echo "[-] Unable to define arc4() call address..."
            exit_error
         fi
-        echo "[+] ARC4 address call defined : [0x$CALLADDR]"
+        echo "[+] ARC4 address call candidate : [0x$CALLADDR]"
 }
 
 # Extract each args values of arc4 calls
 function extract_variables_from_binary(){
-        echo "[*] Extracting each args address and size for the 14 arc4() calls..."
-
+        echo "[*] Extracting each args address and size for the 14 arc4() calls with address [0x$CALLADDR]..."
         # Initialize the number of line before CALLADDR to looking for addresses of args
         i=2
         # Retrieve ordered list of address var and put it to $CALLADDRFILE
@@ -157,8 +165,8 @@ function extract_variables_from_binary(){
                 $GREP -B $i "call.*$CALLADDR" $DUMPFILE | $GREP -v "$CALLADDR" | $GREP -Eo "(0x[0-9a-f]{6,})" > $CALLADDRFILE
                 i=$(($i + 1))
                 if [ $i -eq 10 ]; then
-                        echo "[-] Unable to extract addresses of 14 arc4 args..."
-                        exit_error
+                        echo "[-] Unable to extract addresses of 14 arc4 args with ARC4 address call [0x$CALLADDR]..."
+                        return;
                 fi
         done
 
@@ -169,13 +177,10 @@ function extract_variables_from_binary(){
                 $GREP -B $i "call.*$CALLADDR" $DUMPFILE | $GREP -v "$CALLADDR" | $GREP -Eo "(0x[0-9a-f]+,)" | $GREP -Eo "(0x[0-9a-f]+)" | $GREP -Ev "0x[0-9a-f]{6,}" > $CALLSIZEFILE
                 i=$(($i + 1))
                 if [ $i -eq 10 ]; then
-                        echo "[-] Unable to extract sizes of 14 arc4 args..."
-                        exit_error
+                        echo "[-] Unable to extract sizes of 14 arc4 args with ARC4 address call [0x$CALLADDR]..."
+                        return;
                 fi
         done
-
-        #cat $CALLADDRFILE
-        #cat $CALLSIZEFILE
 
         # For each full address in $CALLADDRFILE and corresponding size in $CALLSIZEFILE
         IFS=$'\n' read -d '' -r -a LISTOFADDR < $CALLADDRFILE
@@ -206,15 +211,15 @@ function extract_variables_from_binary(){
         #
         #  movl   $0x<adr>,(%esp)
         #  call   $CALLADDR
-                #
-                # UPDATE 18/11/2015 :
-                # Adding support of objdump format
-                # Ubuntu 14.04 LTS x86_64
-                #
-                #  mov    $0x<hex>,%esi
-                #  mov    $0x<adr>,%edi
-                #  callq  $CALLADDR <fork@plt+0x23b>
-                #
+        #
+        # UPDATE 18/11/2015 :
+        # Adding support of objdump format
+        # Ubuntu 14.04 LTS x86_64
+        #
+        #  mov    $0x<hex>,%esi
+        #  mov    $0x<adr>,%edi
+        #  callq  $CALLADDR <fork@plt+0x23b>
+        #
 
         # Key is the address with the variable content.
         KEY=$(echo $i | $CUT -d 'x' -f 2)
@@ -675,12 +680,19 @@ fi
 generate_dump
 
 # Find out the most called function. This function is arc4() and there are 14 calls.
+# Then retrieve the data used in each CALLADDR call
+c=1
 if [ -z "$CALLADDR" ]; then
-        extract_arc4_call_addr
+	# Case when ARC4 offset is unknown and there are multiple candidate
+        while [[ $($WC -l < $CALLSIZEFILE) -ne 14 ]]; do
+		extract_arc4_call_addr "$c"
+                extract_variables_from_binary
+		c=$(($c + 1))
+        done
+else
+	# Case when the ARC4 address is already defined and passed throught args
+	extract_variables_from_binary
 fi
-
-# Retrieve the data used in each CALLADDR call
-extract_variables_from_binary
 
 # Retrieve PWD from function call just before the first CALLADDR call
 extract_password_from_binary
@@ -694,8 +706,8 @@ $GCC -o $TMPBINARY ${TMPBINARY}.c >/dev/null 2>&1
 echo "[*] Executing [$TMPBINARY] to decrypt [${BINARY}]"
 
 if [ -z "$OUTPUTFILE" ]; then
-        echo "[*] Retrieving initial source code in [${BINARY%.x}]"
-        $TMPBINARY > ${BINARY%.x}
+        echo "[*] Retrieving initial source code in [${BINARY%.sh.x}.sh]"
+        $TMPBINARY > ${BINARY%.sh.x}.sh
 else
         echo "[*] Retrieving initial source code in [$OUTPUTFILE]"
         $TMPBINARY > $OUTPUTFILE
